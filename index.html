@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LensCloak Studio — Anti-AI & Digital Footprint Eraser</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="bg-mesh"></div>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="navbar">
+            <div class="brand">
+                <div class="brand-badge">SHIELD v2.4</div>
+                <h1>Lens<span>Cloak</span> Studio</h1>
+                <p class="tagline">Анти-визуальный поиск (Google Lens / Pimeyes) + 100% Очистка EXIF</p>
+            </div>
+            <div class="header-badges">
+                <span class="status-badge secure">
+                    <span class="pulse-dot"></span>
+                    100% Local Browser Execution
+                </span>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="workspace">
+            <!-- Left Controls Panel -->
+            <aside class="control-panel glass-card">
+                <div class="panel-section">
+                    <h2><span class="icon">📁</span> 1. Исходные файлы / папка</h2>
+                    <div class="drop-zone" id="dropZone">
+                        <input type="file" id="fileInput" accept="image/*" hidden>
+                        <input type="file" id="folderInput" webkitdirectory directory multiple hidden>
+                        <div class="drop-content">
+                            <div class="drop-icon">⚡📋</div>
+                            <h3>Ctrl+V / Cmd+V — вставить из буфера</h3>
+                            <p>или перетащите фото / кликните для выбора</p>
+                            <span class="drop-note">100% локальная обработка в браузере</span>
+                        </div>
+                    </div>
+                    <button class="btn-folder" id="folderSelectBtn">
+                        <span>📂 Выбрать всю папку с фотографиями</span>
+                    </button>
+                </div>
+
+                <div class="panel-section">
+                    <h2><span class="icon">⚡</span> 2. Защитные алгоритмы</h2>
+                    
+                    <!-- Slider: Noise -->
+                    <div class="control-group">
+                        <div class="label-row">
+                            <label for="noiseIntensity">Adversarial Шум (CNN Distort)</label>
+                            <span class="val-badge" id="noiseVal">5.5</span>
+                        </div>
+                        <input type="range" id="noiseIntensity" min="0" max="15" step="0.5" value="5.5">
+                        <p class="control-hint">Сбивает сверточные карты признаков Google Lens</p>
+                    </div>
+
+                    <!-- Slider: Rotation -->
+                    <div class="control-group">
+                        <div class="label-row">
+                            <label for="rotationDeg">Микро-поворот (Геометрия)</label>
+                            <span class="val-badge" id="rotateVal">1.2°</span>
+                        </div>
+                        <input type="range" id="rotationDeg" min="-3.0" max="3.0" step="0.1" value="1.2">
+                        <p class="control-hint">Бесшовное отражение краев без обрезки</p>
+                    </div>
+
+                    <!-- Slider: Color Shift -->
+                    <div class="control-group">
+                        <div class="label-row">
+                            <label for="colorShift">Сдвиг цветовых каналов (RGB)</label>
+                            <span class="val-badge" id="colorVal">2 px</span>
+                        </div>
+                        <input type="range" id="colorShift" min="0" max="8" step="1" value="2">
+                        <p class="control-hint">Искажает гистограммы и баланс эмбеддинга</p>
+                    </div>
+
+                    <!-- Toggle: Horizontal Flip -->
+                    <div class="toggle-group">
+                        <label class="switch">
+                            <input type="checkbox" id="flipHorizontal">
+                            <span class="slider round"></span>
+                        </label>
+                        <div class="toggle-text">
+                            <strong>🔄 Зеркально отразить (Flip Horizontal)</strong>
+                            <p>Самый мощный способ сбить поиск Google Lens</p>
+                        </div>
+                    </div>
+
+                    <!-- Toggle: EXIF Strip -->
+                    <div class="toggle-group">
+                        <label class="switch">
+                            <input type="checkbox" id="stripExif" checked disabled>
+                            <span class="slider round"></span>
+                        </label>
+                        <div class="toggle-text">
+                            <strong>Очистить EXIF / ICC / XMP</strong>
+                            <p>Удаляет GPS, модель камеры, серийники и профили</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Export Action -->
+                <div class="panel-section action-section">
+                    <h2><span class="icon">💾</span> 3. Сохранение и буфер</h2>
+                    <div class="format-row">
+                        <label>Формат:</label>
+                        <select id="exportFormat">
+                            <option value="image/png">PNG (Без потерь)</option>
+                            <option value="image/jpeg" selected>JPEG (High Quality)</option>
+                            <option value="image/webp">WebP (Современный)</option>
+                        </select>
+                    </div>
+                    <button class="btn-primary" id="copyBtn" disabled>
+                        <span>📋 Скопировать очищенное в буфер</span>
+                    </button>
+                    <button class="btn-secondary" id="downloadBtn" disabled>
+                        <span>📥 Скачать файлом</span>
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Right Preview Area -->
+            <section class="preview-area glass-card">
+                <div class="preview-header">
+                    <div class="view-tabs">
+                        <button class="tab-btn active" data-view="split">Сравнение (До / После)</button>
+                        <button class="tab-btn" data-view="diff">Карта искажений (Heatmap)</button>
+                    </div>
+                    <div class="file-info" id="fileInfo">Файл не загружен</div>
+                </div>
+
+                <div class="canvas-stage" id="canvasStage">
+                    <div class="placeholder-message" id="placeholderMsg">
+                        <div class="placeholder-glow">
+                            <svg viewBox="0 0 24 24" width="64" height="64" stroke="currentColor" stroke-width="1.5" fill="none">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                <polyline points="21 15 16 10 5 21"></polyline>
+                            </svg>
+                        </div>
+                        <p>Загрузите изображение для анализа и визуального клоукинга</p>
+                    </div>
+
+                    <!-- Side by Side Preview -->
+                    <div class="side-by-side" id="sideBySide" style="display: none;">
+                        <div class="view-box">
+                            <span class="view-tag">Оригинал (С метаданными)</span>
+                            <canvas id="origCanvas"></canvas>
+                        </div>
+                        <div class="view-box">
+                            <span class="view-tag protected">Защищенный (Cloaked + Clean)</span>
+                            <canvas id="cloakedCanvas"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Diff Heatmap Preview -->
+                    <div class="diff-view" id="diffView" style="display: none;">
+                        <span class="view-tag heatmap-tag">Внесенный визуальный шум (Усилен 15x для наглядности)</span>
+                        <canvas id="diffCanvas"></canvas>
+                    </div>
+                </div>
+
+                <!-- Footer Status Bar -->
+                <div class="metadata-status-bar" id="statusBar" style="display: none;">
+                    <div class="meta-item">
+                        <span class="meta-label">EXIF / GPS:</span>
+                        <span class="meta-value stripped">УДАЛЕНО</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">ICC Профиль:</span>
+                        <span class="meta-value stripped">ОЧИЩЕНО</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Размер:</span>
+                        <span class="meta-value" id="statusDims">-- x --</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Lens Cloaking:</span>
+                        <span class="meta-value active-cloak">АКТИВЕН</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

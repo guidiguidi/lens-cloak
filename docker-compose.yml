@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  lens-cloak:
+    build: .
+    container_name: lens-cloak
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
